@@ -4,8 +4,8 @@ import (
 	"database/sql"
 	"testing"
 
-	"github.com/devfullcycle/gointensivo/internal/order/entity"
 	"github.com/stretchr/testify/suite"
+	"github.com/thiagorcode/gointensivo/internal/order/entity"
 
 	// sqlite3
 	_ "github.com/mattn/go-sqlite3"
@@ -16,12 +16,15 @@ type OrderRepositoryTestSuite struct {
 	Db *sql.DB
 }
 
+// SetupSuite Executa assim que inicia
 func (suite *OrderRepositoryTestSuite) SetupSuite() {
 	db, err := sql.Open("sqlite3", ":memory:")
 	suite.NoError(err)
 	db.Exec("CREATE TABLE orders (id varchar(255) NOT NULL, price float NOT NULL, tax float NOT NULL, final_price float NOT NULL, PRIMARY KEY (id))")
 	suite.Db = db
 }
+
+// TearDownTest executa logo em seguida que finaliza
 
 func (suite *OrderRepositoryTestSuite) TearDownTest() {
 	suite.Db.Close()
@@ -40,6 +43,7 @@ func (suite *OrderRepositoryTestSuite) TestGivenAnOrder_WhenSave_ThenShouldSaveO
 	suite.NoError(err)
 
 	var orderResult entity.Order
+	// Scan verifica se tem os mesmos valores dos que criei antes no banco
 	err = suite.Db.QueryRow("Select id, price, tax, final_price from orders where id = ?", order.ID).
 		Scan(&orderResult.ID, &orderResult.Price, &orderResult.Tax, &orderResult.FinalPrice)
 
